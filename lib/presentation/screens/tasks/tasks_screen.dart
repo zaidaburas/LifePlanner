@@ -411,7 +411,7 @@ class _TaskCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Cairo',
+                        fontFamily: 'Cairo', 
                         decoration: task.status == 'مكتملة'
                             ? TextDecoration.lineThrough
                             : null,
