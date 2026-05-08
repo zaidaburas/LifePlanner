@@ -1,3 +1,32 @@
+import 'package:flutter/material.dart';
+
+class TaskType {
+  final String name;
+  final IconData icon;
+
+  const TaskType(this.name, this.icon);
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'icon': icon.codePoint,
+      };
+
+  factory TaskType.fromJson(Map<String, dynamic> json) => TaskType(
+        json['name'],
+        IconData(json['icon'], fontFamily: 'MaterialIcons'),
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TaskType &&
+          runtimeType == other.runtimeType &&
+          name == other.name;
+
+  @override
+  int get hashCode => name.hashCode;
+}
+
 class AppConstants {
   static const String appName = 'Life Planner';
   static const String appVersion = '1.1.0';
@@ -21,6 +50,76 @@ class AppConstants {
     'تصميم',
     'تطوير ذات',
     'أخرى',
+  ];
+
+  // Default Task Type Icons
+  static const List<IconData> defaultTaskTypeIcons = [
+    Icons.school,
+    Icons.code,
+    Icons.account_balance,
+    Icons.work,
+    Icons.person,
+    Icons.group,
+    Icons.palette,
+    Icons.self_improvement,
+    Icons.more_horiz,
+  ];
+
+  // Available Icons for Custom Types
+  static const List<IconData> availableIcons = [
+    Icons.home,
+    Icons.work,
+    Icons.school,
+    Icons.code,
+    Icons.palette,
+    Icons.music_note,
+    Icons.sports_soccer,
+    Icons.restaurant,
+    Icons.shopping_cart,
+    Icons.flight,
+    Icons.directions_car,
+    Icons.local_hospital,
+    Icons.pets,
+    Icons.book,
+    Icons.camera,
+    Icons.phone,
+    Icons.email,
+    Icons.chat,
+    Icons.favorite,
+    Icons.star,
+    Icons.thumb_up,
+    Icons.lightbulb,
+    Icons.warning,
+    Icons.error,
+    Icons.check_circle,
+    Icons.cancel,
+    Icons.access_time,
+    Icons.date_range,
+    Icons.location_on,
+    Icons.attach_money,
+    Icons.security,
+    Icons.settings,
+    Icons.help,
+    Icons.info,
+    Icons.label,
+    Icons.category,
+    Icons.extension,
+    Icons.build,
+    Icons.create,
+    Icons.edit,
+    Icons.delete,
+    Icons.share,
+    Icons.download,
+    Icons.upload,
+    Icons.refresh,
+    Icons.sync,
+    Icons.lock,
+    Icons.visibility,
+    Icons.visibility_off,
+    Icons.search,
+    Icons.filter_list,
+    Icons.sort,
+    Icons.more_vert,
   ];
 
   // Shared Preferences Keys

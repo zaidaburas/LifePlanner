@@ -14,6 +14,7 @@ class TaskTypesScreen extends StatefulWidget {
 class _TaskTypesScreenState extends State<TaskTypesScreen> {
   final _addCtrl = TextEditingController();
   final _editCtrl = TextEditingController();
+  IconData _selectedIcon = Icons.label;
 
   @override
   void dispose() {
@@ -110,6 +111,18 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
+                    IconButton(
+                      onPressed: () => _showIconPicker(context),
+                      icon: Icon(_selectedIcon, color: AppColors.primary),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.all(12),
+                      ),
+                      tooltip: 'اختيار الأيقونة',
+                    ),
+                    const SizedBox(width: 10),
                     ElevatedButton.icon(
                       onPressed: () => _addType(context, provider),
                       icon: const Icon(Icons.add, color: Colors.white, size: 18),
@@ -157,6 +170,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
                   .entries
                   .map((entry) => _buildDefaultTypeTile(
                       entry.value,
+                      AppConstants.defaultTaskTypeIcons[entry.key],
                       entry.key == AppConstants.defaultTaskTypes.length - 1,
                       isDark,
                       textPrimary))
@@ -199,16 +213,16 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
               ),
               child: Column(
                 children: provider.customTaskTypes
-                    .asMap()
-                    .entries
-                    .map((entry) => _buildCustomTypeTile(
-                        entry.value,
-                        entry.key == provider.customTaskTypes.length - 1,
-                        isDark,
-                        textPrimary,
-                        context,
-                        provider))
-                    .toList(),
+                  .asMap()
+                  .entries
+                  .map((entry) => _buildCustomTypeTile(
+                      entry.value,
+                      entry.key == provider.customTaskTypes.length - 1,
+                      isDark,
+                      textPrimary,
+                      context,
+                      provider))
+                  .toList(),
               ),
             ),
           ] else ...[
@@ -247,7 +261,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
   }
 
   Widget _buildDefaultTypeTile(
-      String type, bool isLast, bool isDark, Color textPrimary) {
+      String type, IconData icon, bool isLast, bool isDark, Color textPrimary) {
     return Container(
       decoration: BoxDecoration(
         border: isLast
@@ -266,7 +280,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
             color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(Icons.label_rounded,
+          child: Icon(icon,
               size: 18, color: AppColors.primary),
         ),
         title: Text(type,
@@ -291,7 +305,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
   }
 
   Widget _buildCustomTypeTile(
-      String type,
+      TaskType type,
       bool isLast,
       bool isDark,
       Color textPrimary,
@@ -315,10 +329,10 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
             color: AppColors.secondary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(Icons.label_rounded,
+          child: Icon(type.icon,
               size: 18, color: AppColors.secondary),
         ),
-        title: Text(type,
+        title: Text(type.name,
             style: TextStyle(
                 color: textPrimary,
                 fontSize: 14,
@@ -348,7 +362,8 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
   void _addType(BuildContext context, AppProvider provider) async {
     final v = _addCtrl.text.trim();
     if (v.isEmpty) return;
-    if (provider.allTaskTypes.contains(v)) {
+    final newType = TaskType(v, _selectedIcon);
+    if (provider.customTaskTypes.any((t) => t.name == v)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('النوع "$v" موجود بالفعل'),
@@ -357,8 +372,9 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
       );
       return;
     }
-    await provider.addCustomTaskType(v);
+    await provider.addCustomTaskType(newType);
     _addCtrl.clear();
+    _selectedIcon = Icons.label; // Reset to default
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -369,19 +385,37 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
     }
   }
 
-  void _showEditDialog(
-      BuildContext context, String type, AppProvider provider) {
-    _editCtrl.text = type;
+  void _showIconPicker(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تعديل النوع'),
-        content: TextField(
-          controller: _editCtrl,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'اسم النوع',
-            border: OutlineInputBorder(),
+        title: const Text('اختر أيقونة'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 6,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemCount: AppConstants.availableIcons.length,
+            itemBuilder: (context, index) {
+              final icon = AppConstants.availableIcons[index];
+              return InkWell(
+                onTap: () {
+                  setState(() => _selectedIcon = icon);
+                  Navigator.pop(ctx);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: AppColors.primary),
+                ),
+              );
+            },
           ),
         ),
         actions: [
@@ -389,25 +423,121 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
             onPressed: () => Navigator.pop(ctx),
             child: const Text('إلغاء'),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final newType = _editCtrl.text.trim();
-              if (newType.isEmpty) return;
-              await provider.editCustomTaskType(type, newType);
-              if (ctx.mounted) Navigator.pop(ctx);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('تم تعديل النوع إلى "$newType"'),
-                    backgroundColor: AppColors.statusCompleted,
+        ],
+      ),
+    );
+  }
+
+  void _showEditDialog(
+      BuildContext context, TaskType type, AppProvider provider) {
+    _editCtrl.text = type.name;
+    IconData selectedIcon = type.icon;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('تعديل النوع'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _editCtrl,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'اسم النوع',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Text('الأيقونة:'),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () => _showIconPickerForEdit(ctx, (icon) {
+                      setState(() => selectedIcon = icon);
+                    }),
+                    icon: Icon(selectedIcon, color: AppColors.primary),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.primary.withOpacity(0.1),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.all(8),
+                    ),
                   ),
-                );
-              }
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final newName = _editCtrl.text.trim();
+                if (newName.isEmpty) return;
+                final newType = TaskType(newName, selectedIcon);
+                await provider.editCustomTaskType(type, newType);
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('تم تعديل النوع إلى "$newName"'),
+                      backgroundColor: AppColors.statusCompleted,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary),
+              child: const Text('حفظ',
+                  style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showIconPickerForEdit(BuildContext context, Function(IconData) onIconSelected) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('اختر أيقونة'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 6,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemCount: AppConstants.availableIcons.length,
+            itemBuilder: (context, index) {
+              final icon = AppConstants.availableIcons[index];
+              return InkWell(
+                onTap: () {
+                  onIconSelected(icon);
+                  Navigator.pop(ctx);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: AppColors.primary),
+                ),
+              );
             },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary),
-            child: const Text('حفظ',
-                style: TextStyle(color: Colors.white)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
           ),
         ],
       ),
@@ -415,13 +545,13 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
   }
 
   void _showDeleteDialog(
-      BuildContext context, String type, AppProvider provider) {
+      BuildContext context, TaskType type, AppProvider provider) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('حذف النوع'),
         content: Text(
-            'هل تريد حذف النوع "$type"؟\n\nالمهام التي تستخدم هذا النوع ستحتفظ بالنوع القديم.'),
+            'هل تريد حذف النوع "${type.name}"؟\n\nالمهام التي تستخدم هذا النوع ستحتفظ بالنوع القديم.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -434,7 +564,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('تم حذف النوع "$type"'),
+                    content: Text('تم حذف النوع "${type.name}"'),
                     backgroundColor: AppColors.accentRed,
                   ),
                 );

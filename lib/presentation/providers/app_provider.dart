@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -29,7 +30,7 @@ class AppProvider extends ChangeNotifier {
   int _sortMode = 0;
 
   // Custom Task Types
-  List<String> _customTaskTypes = [];
+  List<TaskType> _customTaskTypes = [];
 
   // Getters
   List<GoalModel> get goals => _goals;
@@ -46,12 +47,12 @@ class AppProvider extends ChangeNotifier {
   List<String> get allTaskTypes {
     final merged = List<String>.from(AppConstants.defaultTaskTypes);
     for (final t in _customTaskTypes) {
-      if (!merged.contains(t)) merged.add(t);
+      if (!merged.contains(t.name)) merged.add(t.name);
     }
     return merged;
   }
 
-  List<String> get customTaskTypes => List.unmodifiable(_customTaskTypes);
+  List<TaskType> get customTaskTypes => List.unmodifiable(_customTaskTypes);
 
   GoalModel? getGoal(String id) => _goals.where((g) => g.id == id).firstOrNull;
   ProjectModel? getProject(String id) =>
@@ -71,7 +72,15 @@ class AppProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       _isDarkMode = prefs.getBool('isDarkMode') ?? false;
       final stored = prefs.getStringList(AppConstants.customTypesKey) ?? [];
-      _customTaskTypes = stored;
+      _customTaskTypes = stored.map((jsonStr) {
+        try {
+          final json = jsonDecode(jsonStr);
+          return TaskType.fromJson(json);
+        } catch (_) {
+          // Handle old format: just string
+          return TaskType(jsonStr, Icons.label);
+        }
+      }).toList();
     } catch (_) {}
   }
 
@@ -79,7 +88,8 @@ class AppProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isDarkMode', _isDarkMode);
-      await prefs.setStringList(AppConstants.customTypesKey, _customTaskTypes);
+      final encoded = _customTaskTypes.map((type) => jsonEncode(type.toJson())).toList();
+      await prefs.setStringList(AppConstants.customTypesKey, encoded);
     } catch (_) {}
   }
 
@@ -182,34 +192,34 @@ class AppProvider extends ChangeNotifier {
   Map<String, dynamic> get dashboardStats => _repo.getDashboardStats();
 
   // ─── Custom Task Types ───
-  Future<void> addCustomTaskType(String type) async {
-    if (type.trim().isEmpty) return;
-    if (!_customTaskTypes.contains(type.trim())) {
-      _customTaskTypes.add(type.trim());
+  Future<void> addCustomTaskType(TaskType type) async {
+    if (type.name.trim().isEmpty) return;
+    if (!_customTaskTypes.any((t) => t.name == type.name.trim())) {
+      _customTaskTypes.add(TaskType(type.name.trim(), type.icon));
       await _savePrefs();
       notifyListeners();
     }
   }
 
-  Future<void> editCustomTaskType(String oldType, String newType) async {
-    if (newType.trim().isEmpty) return;
-    final idx = _customTaskTypes.indexOf(oldType);
+  Future<void> editCustomTaskType(TaskType oldType, TaskType newType) async {
+    if (newType.name.trim().isEmpty) return;
+    final idx = _customTaskTypes.indexWhere((t) => t.name == oldType.name);
     if (idx >= 0) {
       // Update tasks that use this type
       for (final t in _tasks) {
-        if (t.taskType == oldType) {
-          t.taskType = newType.trim();
+        if (t.taskType == oldType.name) {
+          t.taskType = newType.name.trim();
           await _repo.saveTask(t);
         }
       }
-      _customTaskTypes[idx] = newType.trim();
+      _customTaskTypes[idx] = TaskType(newType.name.trim(), newType.icon);
       await _savePrefs();
       loadAll();
     }
   }
 
-  Future<void> deleteCustomTaskType(String type) async {
-    _customTaskTypes.remove(type);
+  Future<void> deleteCustomTaskType(TaskType type) async {
+    _customTaskTypes.removeWhere((t) => t.name == type.name);
     await _savePrefs();
     notifyListeners();
   }
@@ -710,7 +720,7 @@ class AppProvider extends ChangeNotifier {
 
     // Import custom types
     final customTypes = data['customTaskTypes'] as List? ?? [];
-    _customTaskTypes = List<String>.from(customTypes);
+    _customTaskTypes = List.from(customTypes);
     await _savePrefs();
 
     loadAll();
