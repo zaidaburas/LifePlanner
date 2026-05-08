@@ -426,7 +426,7 @@ class DashboardScreen extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(width: 10),
               itemBuilder: (context, i) {
                 final task = tasks[i];
-                final typeColor = AppUtils.getTaskTypeColor(task.taskType);
+                final typeColor = AppUtils.getTaskTypeColor(task.taskType, provider: provider);
                 return AppCard(
                   onTap: () {},
                   padding: const EdgeInsets.all(14),
@@ -438,7 +438,7 @@ class DashboardScreen extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              AppUtils.getTaskTypeIcon(task.taskType),
+                              AppUtils.getTaskTypeIcon(task.taskType, provider),
                               size: 16,
                               color: typeColor,
                             ),
@@ -566,13 +566,13 @@ class DashboardScreen extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: AppUtils.getTaskTypeColor(t.taskType).withOpacity(0.12),
+                          color: AppUtils.getTaskTypeColor(t.taskType, provider: provider).withOpacity(0.12),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          AppUtils.getTaskTypeIcon(t.taskType),
+                          AppUtils.getTaskTypeIcon(t.taskType, provider),
                           size: 18,
-                          color: AppUtils.getTaskTypeColor(t.taskType),
+                          color: AppUtils.getTaskTypeColor(t.taskType, provider: provider),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -592,7 +592,7 @@ class DashboardScreen extends StatelessWidget {
                             AppProgressBar(
                               progress: t.progress,
                               height: 4,
-                              color: AppUtils.getTaskTypeColor(t.taskType),
+                              color: AppUtils.getTaskTypeColor(t.taskType, provider: provider),
                             ),
                           ],
                         ),

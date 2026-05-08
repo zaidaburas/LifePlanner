@@ -256,7 +256,7 @@ class _ProgressTab extends StatelessWidget {
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
                 const SizedBox(height: 16),
                 ...byType.entries.map((e) {
-                  final color = AppUtils.getTaskTypeColor(e.key);
+                  final color = AppUtils.getTaskTypeColor(e.key, provider: provider);
                   final maxVal = byType.values.reduce((a, b) => a > b ? a : b);
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -266,7 +266,7 @@ class _ProgressTab extends StatelessWidget {
                           width: 70,
                           child: Row(
                             children: [
-                              Icon(AppUtils.getTaskTypeIcon(e.key), size: 14, color: color),
+                              Icon(AppUtils.getTaskTypeIcon(e.key,provider), size: 14, color: color),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(e.key,
@@ -453,7 +453,7 @@ class _TimeTab extends StatelessWidget {
                     ..sort((a, b) => b.value.compareTo(a.value));
                   final maxVal = sorted.first.value;
                   return sorted.map((e) {
-                    final color = AppUtils.getTaskTypeColor(e.key);
+                    final color = AppUtils.getTaskTypeColor(e.key, provider: provider);
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Column(
@@ -461,7 +461,7 @@ class _TimeTab extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(AppUtils.getTaskTypeIcon(e.key), size: 14, color: color),
+                              Icon(AppUtils.getTaskTypeIcon(e.key, provider), size: 14, color: color),
                               const SizedBox(width: 6),
                               Text(e.key, style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
                               const Spacer(),
@@ -501,12 +501,12 @@ class _TimeTab extends StatelessWidget {
                 final sorted = List.from(provider.tasks)
                   ..sort((a, b) => b.actualMinutes.compareTo(a.actualMinutes));
                 return sorted.take(5).map<Widget>((t) {
-                  final color = AppUtils.getTaskTypeColor(t.taskType);
+                  final color = AppUtils.getTaskTypeColor(t.taskType, provider: provider);
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 7),
                     child: Row(
                       children: [
-                        Icon(AppUtils.getTaskTypeIcon(t.taskType), size: 16, color: color),
+                        Icon(AppUtils.getTaskTypeIcon(t.taskType, provider), size: 16, color: color),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(t.title,

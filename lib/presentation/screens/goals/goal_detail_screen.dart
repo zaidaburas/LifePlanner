@@ -88,9 +88,11 @@ class GoalDetailScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold, fontFamily: 'Cairo',
                         )),
                     if (goal.description.isNotEmpty)
-                      Text(goal.description,
-                          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontFamily: 'Cairo'),
-                          maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Expanded(
+                        child: Text(goal.description,
+                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontFamily: 'Cairo'),
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
+                      ),
                     const SizedBox(height: 8),
                     Row(
                       children: [

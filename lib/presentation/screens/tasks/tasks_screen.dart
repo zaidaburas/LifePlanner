@@ -162,13 +162,13 @@ class _TasksScreenState extends State<TasksScreen>
 
   Widget _buildFiltersRow(BuildContext context, AppProvider provider, bool isDark) {
     final filters = ['الكل',...provider.allTaskTypes];
-    print('\n \n \n \n \n \n \n \n');
-    print('\n \n \n \n \n \n \n \n');
-    print('\n \n \n \n \n \n \n \n');
-    print(provider.allTaskTypes);
-    print('\n \n \n \n \n \n \n \n');
-    print('\n \n \n \n \n \n \n \n');
-    print('\n \n \n \n \n \n \n \n');
+    // print('\n \n \n \n \n \n \n \n');
+    // print('\n \n \n \n \n \n \n \n');
+    // print('\n \n \n \n \n \n \n \n');
+    // print(provider.allTaskTypes);
+    // print('\n \n \n \n \n \n \n \n');
+    // print('\n \n \n \n \n \n \n \n');
+    // print('\n \n \n \n \n \n \n \n');
     return SizedBox(
       height: 44,
       child: ListView.separated(
@@ -197,7 +197,7 @@ class _TasksScreenState extends State<TasksScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (i > 0) ...[
-                    Icon(AppUtils.getTaskTypeIcon0(filters[i],provider),
+                    Icon(AppUtils.getTaskTypeIcon(filters[i],provider),
                         size: 13,
                         color: isSelected ? Colors.white : color),
                     const SizedBox(width: 4),
@@ -372,7 +372,7 @@ class _TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final typeColor = AppUtils.getTaskTypeColor(task.taskType);
+    final typeColor = AppUtils.getTaskTypeColor(task.taskType, provider: context.read<AppProvider>());
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isOverdue = task.deadline != null &&
         task.deadline!.isBefore(DateTime.now()) &&
@@ -403,7 +403,7 @@ class _TaskCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  AppUtils.getTaskTypeIcon(task.taskType),
+                  AppUtils.getTaskTypeIcon(task.taskType, context.read<AppProvider>()),
                   color: typeColor,
                   size: 22,
                 ),

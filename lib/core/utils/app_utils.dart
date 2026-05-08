@@ -103,36 +103,36 @@ class AppUtils {
   }
 
   static Color getTaskTypeColor(String type,{AppProvider? provider}) {
-    return AppConstants.availableIcons.any((icon) => icon is Icon && icon.icon == getTaskTypeIcon0(type, provider??AppProvider()))
-        ? (AppConstants.availableIcons.firstWhere((icon) => icon is Icon && icon.icon == getTaskTypeIcon0(type, provider??AppProvider())) as Icon).color!
+    return AppConstants.availableIcons.any((icon) => icon is Icon && icon.icon == getTaskTypeIcon(type, provider??AppProvider()))
+        ? (AppConstants.availableIcons.firstWhere((icon) => icon is Icon && icon.icon == getTaskTypeIcon(type, provider??AppProvider())) as Icon).color!
         :
     AppColors.taskTypeColors[type] ?? AppColors.textSecondary;
   }
 
-  static IconData getTaskTypeIcon(String type) {
-    switch (type) {
-      case 'تعلم':
-        return Icons.school;
-      case 'برمجة':
-        return Icons.code;
-      case 'جامعة':
-        return Icons.account_balance;
-      case 'عمل':
-        return Icons.work;
-      case 'شخصي':
-        return Icons.person;
-      case 'شبكة':
-        return Icons.hub;
-      case 'تصميم':
-        return Icons.design_services;
-      case 'تطوير ذات':
-        return Icons.self_improvement;
-      default:
-        return Icons.task_alt;
-    }
-  }
+  // static IconData getTaskTypeIcon(String type) {
+  //   switch (type) {
+  //     case 'تعلم':
+  //       return Icons.school;
+  //     case 'برمجة':
+  //       return Icons.code;
+  //     case 'جامعة':
+  //       return Icons.account_balance;
+  //     case 'عمل':
+  //       return Icons.work;
+  //     case 'شخصي':
+  //       return Icons.person;
+  //     case 'شبكة':
+  //       return Icons.hub;
+  //     case 'تصميم':
+  //       return Icons.design_services;
+  //     case 'تطوير ذات':
+  //       return Icons.self_improvement;
+  //     default:
+  //       return Icons.task_alt;
+  //   }
+  // }
 
-  static IconData getTaskTypeIcon0(String type,AppProvider provider) {
+  static IconData getTaskTypeIcon(String type,[AppProvider? provider]) {
     switch (type) {
       case 'تعلم':
         return Icons.school;
@@ -161,7 +161,7 @@ class AppUtils {
         // print('\n \n \n \n \n \n \n \n');
         // print('\n \n \n \n \n \n \n \n');
           try {
-            var r = provider.customTaskTypes.firstWhere((t) => t.name == type);
+            var r = (provider??AppProvider()).customTaskTypes.firstWhere((t) => t.name == type);
             return r.icon;
           } catch (e) {
             return Icons.task_alt;

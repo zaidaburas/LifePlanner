@@ -47,7 +47,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen>
       );
     }
 
-    final typeColor = AppUtils.getTaskTypeColor(task.taskType);
+    final typeColor = AppUtils.getTaskTypeColor(task.taskType, provider: provider);
     final phases = provider.getPhasesForTask(task.id);
     final obstacles = provider.getObstaclesForLinked(task.id);
     final project = provider.projects.where((p) => p.id == task.projectId).firstOrNull;
@@ -109,7 +109,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(AppUtils.getTaskTypeIcon(task.taskType),
+                              Icon(AppUtils.getTaskTypeIcon(task.taskType,provider),
                                   size: 12, color: Colors.white),
                               const SizedBox(width: 4),
                               Text(task.taskType,
@@ -869,7 +869,7 @@ class _RelationsTab extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(color: color.withOpacity(0.12), shape: BoxShape.circle),
-                child: Icon(AppUtils.getTaskTypeIcon(relTask.taskType), color: color, size: 18),
+                child: Icon(AppUtils.getTaskTypeIcon(relTask.taskType, provider), color: color, size: 18),
               ),
               const SizedBox(width: 12),
               Expanded(

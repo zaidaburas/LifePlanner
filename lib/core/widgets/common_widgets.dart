@@ -140,7 +140,7 @@ class UrgentBadge extends StatelessWidget {
         vertical: compact ? 2 : 4,
       ),
       decoration: BoxDecoration(
-        color: AppColors.secondaryLight.withOpacity(0.15),
+        color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.7),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

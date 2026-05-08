@@ -178,7 +178,7 @@ class ProjectDetailScreen extends StatelessWidget {
               )
             else
               ...tasks.map((t) {
-                final tc = AppUtils.getTaskTypeColor(t.taskType);
+                final tc = AppUtils.getTaskTypeColor(t.taskType, provider: provider);
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: AppCard(
@@ -195,7 +195,7 @@ class ProjectDetailScreen extends StatelessWidget {
                             color: tc.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(AppUtils.getTaskTypeIcon(t.taskType), color: tc, size: 18),
+                          child: Icon(AppUtils.getTaskTypeIcon(t.taskType, provider), color: tc, size: 18),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
