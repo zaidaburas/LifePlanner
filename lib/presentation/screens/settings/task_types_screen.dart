@@ -14,7 +14,7 @@ class TaskTypesScreen extends StatefulWidget {
 class _TaskTypesScreenState extends State<TaskTypesScreen> {
   final _addCtrl = TextEditingController();
   final _editCtrl = TextEditingController();
-  IconData _selectedIcon = Icons.label;
+  Widget _selectedIcon = Icon(Icons.label);
 
   @override
   void dispose() {
@@ -113,7 +113,8 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
                     const SizedBox(width: 10),
                     IconButton(
                       onPressed: () => _showIconPicker(context),
-                      icon: Icon(_selectedIcon, color: AppColors.primary),
+                      icon: _selectedIcon,
+                      // Icon(_selectedIcon, color: AppColors.primary),
                       style: IconButton.styleFrom(
                         backgroundColor: AppColors.primary.withOpacity(0.1),
                         shape: RoundedRectangleBorder(
@@ -362,7 +363,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
   void _addType(BuildContext context, AppProvider provider) async {
     final v = _addCtrl.text.trim();
     if (v.isEmpty) return;
-    final newType = TaskType(v, _selectedIcon);
+    final newType = TaskType(v, (_selectedIcon is Icon ? (_selectedIcon as Icon).icon : Icons.label)!);
     if (provider.customTaskTypes.any((t) => t.name == v)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -374,7 +375,8 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
     }
     await provider.addCustomTaskType(newType);
     _addCtrl.clear();
-    _selectedIcon = Icons.label; // Reset to default
+    // _selectedIcon = Icons.label; // Reset to default
+    _selectedIcon = Icon(Icons.label,) ; // Reset to default
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -412,7 +414,8 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
                     border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: AppColors.primary),
+                  child: icon,
+                  // Icon(icon, color: AppColors.primary),
                 ),
               );
             },
@@ -432,6 +435,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
       BuildContext context, TaskType type, AppProvider provider) {
     _editCtrl.text = type.name;
     IconData selectedIcon = type.icon;
+    Color selectedColor = type.color;
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -455,9 +459,12 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => _showIconPickerForEdit(ctx, (icon) {
-                      setState(() => selectedIcon = icon);
+                      setState(() {
+                        selectedIcon = icon is Icon ? icon.icon! : type.icon;
+                        selectedColor = icon is Icon ? icon.color! : type.color;
+                      } );
                     }),
-                    icon: Icon(selectedIcon, color: AppColors.primary),
+                    icon: Icon(selectedIcon, color: selectedColor),
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.primary.withOpacity(0.1),
                       shape: RoundedRectangleBorder(
@@ -501,7 +508,7 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
     );
   }
 
-  void _showIconPickerForEdit(BuildContext context, Function(IconData) onIconSelected) {
+  void _showIconPickerForEdit(BuildContext context, Function(Widget) onIconSelected) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -528,7 +535,8 @@ class _TaskTypesScreenState extends State<TaskTypesScreen> {
                     border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: AppColors.primary),
+                  child: icon,
+                  // Icon(icon, color: AppColors.primary),
                 ),
               );
             },

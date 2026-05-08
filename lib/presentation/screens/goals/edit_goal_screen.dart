@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/widgets/common_widgets.dart';
 import '../../../data/models/goal_model.dart';
 import '../../providers/app_provider.dart';
 
@@ -75,6 +76,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
       ..iconName = _iconName;
 
     await provider.updateGoal(widget.goal);
+    
     if (mounted) Navigator.pop(context, true);
   }
 
@@ -214,44 +216,9 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                         fontSize: 13,
                         fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: List.generate(
-                    AppConstants.goalColors.length,
-                    (i) => GestureDetector(
-                      onTap: () => setState(() => _colorIndex = i),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: Color(AppConstants.goalColors[i]),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: _colorIndex == i
-                                ? Colors.white
-                                : Colors.transparent,
-                            width: 3,
-                          ),
-                          boxShadow: _colorIndex == i
-                              ? [
-                                  BoxShadow(
-                                    color: Color(AppConstants.goalColors[i])
-                                        .withOpacity(0.6),
-                                    blurRadius: 8,
-                                    spreadRadius: 1,
-                                  )
-                                ]
-                              : [],
-                        ),
-                        child: _colorIndex == i
-                            ? const Icon(Icons.check,
-                                color: Colors.white, size: 18)
-                            : null,
-                      ),
-                    ),
-                  ),
+                ColorPickerRow(
+                  selectedIndex: _colorIndex,
+                  onChanged: (i) => setState(() => _colorIndex = i),
                 ),
                 const SizedBox(height: 16),
                 Text('الأيقونة',

@@ -161,7 +161,14 @@ class _TasksScreenState extends State<TasksScreen>
   }
 
   Widget _buildFiltersRow(BuildContext context, AppProvider provider, bool isDark) {
-    final filters = ['الكل', ...AppConstants.defaultTaskTypes,...provider.allTaskTypes];
+    final filters = ['الكل',...provider.allTaskTypes];
+    print('\n \n \n \n \n \n \n \n');
+    print('\n \n \n \n \n \n \n \n');
+    print('\n \n \n \n \n \n \n \n');
+    print(provider.allTaskTypes);
+    print('\n \n \n \n \n \n \n \n');
+    print('\n \n \n \n \n \n \n \n');
+    print('\n \n \n \n \n \n \n \n');
     return SizedBox(
       height: 44,
       child: ListView.separated(
@@ -173,7 +180,7 @@ class _TasksScreenState extends State<TasksScreen>
           final isSelected = i == 0
               ? provider.filterType.isEmpty
               : provider.filterType == filters[i];
-          final color = i == 0 ? AppColors.primary : AppUtils.getTaskTypeColor(filters[i]);
+          final color = i == 0 ? AppColors.primary : AppUtils.getTaskTypeColor(filters[i],provider: provider);
           return GestureDetector(
             onTap: () => provider.setFilterType(i == 0 ? '' : filters[i]),
             child: AnimatedContainer(
@@ -190,7 +197,7 @@ class _TasksScreenState extends State<TasksScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (i > 0) ...[
-                    Icon(AppUtils.getTaskTypeIcon(filters[i]),
+                    Icon(AppUtils.getTaskTypeIcon0(filters[i],provider),
                         size: 13,
                         color: isSelected ? Colors.white : color),
                     const SizedBox(width: 4),
