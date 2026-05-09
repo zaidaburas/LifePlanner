@@ -107,7 +107,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: AppColors.textPrimary),
       ),
-      CardThemeData: CardThemeData(
+      CardTheme: CardTheme(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -222,7 +222,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: AppColors.darkTextPrimary),
       ),
-      CardThemeData: CardThemeData(
+      CardTheme: CardTheme(
         color: AppColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
